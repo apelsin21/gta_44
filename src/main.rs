@@ -82,6 +82,7 @@ fn main() {
     glfw.set_error_callback(glfw::FAIL_ON_ERRORS);
     window.set_key_polling(true);
     window.set_framebuffer_size_polling(true);
+    window.set_char_polling(true);
 
     let (w, h) = window.get_framebuffer_size();
     let mut frame = gfx::Frame::new(w as u16, h as u16);
@@ -159,9 +160,11 @@ fn main() {
                 glfw::WindowEvent::Key(glfw::Key::Escape, _, glfw::Action::Press, _) =>
                     window.set_should_close(true),
                 glfw::WindowEvent::FramebufferSize(w, h) => {
-                    println!("framebuffer resizing to: {}x{}", w, h);
                     frame.width = w as u16;
                     frame.height = h as u16;
+                },
+                glfw::WindowEvent::Char(c) => {
+                    println!("pressed char key {}", c);
                 },
                 _ => {},
             }
@@ -175,4 +178,3 @@ fn main() {
         window.swap_buffers();
     }
 }
-
