@@ -2,6 +2,8 @@
 
 extern crate cgmath;
 extern crate gfx;
+extern crate image;
+
 #[macro_use]
 #[plugin]
 extern crate gfx_macros;
@@ -13,6 +15,8 @@ use cgmath::{Transform, AffineMatrix3};
 use gfx::{Device, DeviceHelper, ToSlice};
 use gfx::batch;
 use glfw::Context;
+
+mod texture;
 
 #[vertex_format]
 #[derive(Copy)]
@@ -114,13 +118,11 @@ fn main() {
     };
     let image_info = texture_info.to_image_info();
     let texture = device.create_texture(texture_info).unwrap();
-    
-    //Checkerboard pattern
-    let texture_data = [0xffu8, 0xffu8, 0xffu8, 0xffu8,
-                        0x00u8, 0x00u8, 0x00u8, 0xffu8,
-                        0x00u8, 0x00u8, 0x00u8, 0xffu8,
-                        0xffu8, 0xffu8, 0xffu8, 0xffu8];
-    
+   
+    let test = texture::Texture::new().load("test.png");
+
+    let texture_data = test.pixels;
+
     device.update_texture(&texture, &image_info, &texture_data).unwrap();
 
     let sampler = device.create_sampler(

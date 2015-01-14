@@ -1,29 +1,17 @@
-[dependencies.cgmath]
-git = "https://github.com/bjz/cgmath-rs"
-
-[dependencies.image]
-git = "https://github.com/pistondevelopers/image"
-
-[dependencies.glutin]
-git = "https://github.com/tomaka/glutin"
-
-[dependencies.glfw]
-git = "https://github.com/bjz/glfw-rs"
-
 [dependencies.gfx]
 git = "https://github.com/gfx-rs/gfx-rs"
 
 [dependencies.gfx_macros]
 git = "https://github.com/gfx-rs/gfx-rs"
 
-[dependencies.time]
-git = "https://github.com/rust-lang/time"
+[dependencies.cgmath]
+git = "https://github.com/bjz/cgmath-rs"
 
-[dependencies.genmesh]
-git = "https://github.com/csherratt/genmesh"
+[dependencies.image]
+git = "https://github.com/pistondevelopers/image"
 
-[dependencies.noise]
-git = "https://github.com/bjz/noise-rs"
+[dependencies.glfw]
+git = "https://github.com/bjz/glfw-rs"
 
 [package]
 
