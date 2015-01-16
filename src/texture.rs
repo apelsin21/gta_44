@@ -2,31 +2,31 @@ extern crate image;
 
 pub struct Texture {
     pixels: Vec<u8>,
-    width: u16,
-    height: u16,
+    width: u32,
+    height: u32,
 }
 
-pub impl Texture {
-    fn new() -> Texture {
+impl Texture {
+    pub fn new() -> Texture {
         Texture {
             pixels: vec![0u8],
-            width: 0u16,
-            height: 0u16,
+            width: 0u32,
+            height: 0u32,
         }
     }
 
-    fn load(self: &mut Texture, path: &Path) {
+    pub fn load(self: &mut Texture, path: &Path) {
         let image = match image::open(path) {
             Ok(i) => i,
-            Err(_) => {
-                panic!("failed to load image");
+            Err(err) => {
+                panic!("failed to load image {}", path.display());
             },
         };
 
         self.pixels = image.raw_pixels();
-
     }
-}
 
-pub fn load(path: &Path) -> &[u8] {
+    pub fn pixels(self: &Texture) -> &Vec<u8> {
+        &self.pixels
+    }
 }

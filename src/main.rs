@@ -118,12 +118,13 @@ fn main() {
     };
     let image_info = texture_info.to_image_info();
     let texture = device.create_texture(texture_info).unwrap();
-   
-    let test = texture::Texture::new().load("test.png");
+  
+    let mut test = texture::Texture::new();
+    test.load(&Path::new("test.png"));
 
-    let texture_data = test.pixels;
+    let mut texture_data = test.pixels();
 
-    device.update_texture(&texture, &image_info, &texture_data).unwrap();
+    device.update_texture(&texture, &image_info, texture_data.as_slice()).unwrap();
 
     let sampler = device.create_sampler(
         gfx::tex::SamplerInfo::new(gfx::tex::FilterMethod::Scale,
