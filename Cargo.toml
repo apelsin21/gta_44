@@ -4,14 +4,14 @@ git = "https://github.com/gfx-rs/gfx-rs"
 [dependencies.gfx_macros]
 git = "https://github.com/gfx-rs/gfx-rs"
 
-[dependencies.nalgebra]
-git = "https://github.com/sebcrozet/nalgebra"
-
 [dependencies.image]
 git = "https://github.com/pistondevelopers/image"
 
 [dependencies.glfw]
 git = "https://github.com/bjz/glfw-rs"
+
+[dependencies.cgmath]
+git = "https://github.com/bjz/cgmath-rs"
 
 [package]
 

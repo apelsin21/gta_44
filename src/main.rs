@@ -1,6 +1,6 @@
 #![feature(plugin)]
 
-extern crate "nalgebra" as na;
+extern crate cgmath;
 extern crate gfx;
 extern crate image;
 
@@ -12,7 +12,10 @@ extern crate glfw;
 use gfx::{Device, DeviceHelper, ToSlice};
 use gfx::batch;
 use glfw::Context;
-use na::{Vec3, Mat4};
+
+use cgmath::FixedArray;
+use cgmath::{Matrix, Point3, Vector3};
+use cgmath::{Transform, AffineMatrix3};
 
 mod texture;
 mod sprite;
@@ -60,12 +63,11 @@ fn main() {
     let state = gfx::DrawState::new().depth(gfx::state::Comparison::LessEqual, true);
 
     let batch: defs::SpriteBatch = context.make_batch(&program, &mesh, slice, &state).unwrap();
-   
-    let identity: Mat4<f32> = na::one();
-    let identity = *identity.as_array();
+  
+    let ident = cgmath::Matrix4::<f32>::identity().into_fixed();
 
-    let shader_data = defs::Params {
-        transform: identity, 
+    let mut shader_data = defs::Params {
+        transform: ident, 
         sampler: (texture, Some(sampler)),
     };
 
@@ -75,6 +77,8 @@ fn main() {
         stencil: 0,
     };
 
+    let mut camera_pos = Point3::new(0.1f32, 2.0f32, 5.0f32);
+
     while !window.should_close() {
         glfw.poll_events();
         
@@ -82,6 +86,19 @@ fn main() {
             match event {
                 glfw::WindowEvent::Key(glfw::Key::Escape, _, glfw::Action::Press, _) =>
                     window.set_should_close(true),
+
+                glfw::WindowEvent::Key(glfw::Key::W, _, _, _) =>
+                    camera_pos.z -= 0.1f32,
+                
+                glfw::WindowEvent::Key(glfw::Key::S, _, _, _) =>
+                    camera_pos.z += 0.1f32,
+                
+                glfw::WindowEvent::Key(glfw::Key::A, _, _, _) =>
+                    camera_pos.x -= 0.1f32,
+                
+                glfw::WindowEvent::Key(glfw::Key::D, _, _, _) =>
+                    camera_pos.x += 0.1f32,
+                
                 glfw::WindowEvent::FramebufferSize(w, h) => {
                     frame.width = w as u16;
                     frame.height = h as u16;
@@ -92,7 +109,17 @@ fn main() {
                 _ => {},
             }
         }
-        
+    
+        let view = cgmath::Matrix4::look_at(
+            &camera_pos,
+            &Point3::new(0.0f32, 0.0, 0.0),
+            &Vector3::unit_z()
+        );
+
+        let proj = cgmath::perspective(cgmath::deg(45.0f32), frame.width as f32 / frame.height as f32, 0.1f32, 100.0f32);
+
+        shader_data.transform = *proj.mul_m(&view).as_fixed();
+
         renderer.clear(clear_data, gfx::COLOR | gfx::DEPTH, &frame);
         renderer.draw(&(&batch, &shader_data, &context), &frame);
         device.submit(renderer.as_buffer());

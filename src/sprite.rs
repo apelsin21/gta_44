@@ -1,5 +1,3 @@
-extern crate "nalgebra" as na;
-
 extern crate gfx;
 extern crate gfx_macros;
 
