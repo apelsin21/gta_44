@@ -20,6 +20,7 @@ use cgmath::{Transform, AffineMatrix3};
 mod texture;
 mod sprite;
 mod defs;
+mod camera;
 
 fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
@@ -77,7 +78,8 @@ fn main() {
         stencil: 0,
     };
 
-    let mut camera_pos = Point3::new(0.1f32, 2.0f32, 5.0f32);
+    let mut camera = camera::Camera::new();
+    camera.eye_pos = Point3::new(0.1f32, 2.0f32, 5.0f32);
 
     while !window.should_close() {
         glfw.poll_events();
@@ -88,20 +90,22 @@ fn main() {
                     window.set_should_close(true),
 
                 glfw::WindowEvent::Key(glfw::Key::W, _, _, _) =>
-                    camera_pos.z -= 0.1f32,
+                    camera.eye_pos.z -= 0.1f32,
                 
                 glfw::WindowEvent::Key(glfw::Key::S, _, _, _) =>
-                    camera_pos.z += 0.1f32,
+                    camera.eye_pos.z += 0.1f32,
                 
                 glfw::WindowEvent::Key(glfw::Key::A, _, _, _) =>
-                    camera_pos.x -= 0.1f32,
+                    camera.eye_pos.x -= 0.1f32,
                 
                 glfw::WindowEvent::Key(glfw::Key::D, _, _, _) =>
-                    camera_pos.x += 0.1f32,
+                    camera.eye_pos.x += 0.1f32,
                 
                 glfw::WindowEvent::FramebufferSize(w, h) => {
                     frame.width = w as u16;
                     frame.height = h as u16;
+        
+                    camera.aspect = frame.width as f32 / frame.height as f32;
                 },
                 glfw::WindowEvent::Char(c) => {
                     println!("pressed char key {}", c);
@@ -109,16 +113,9 @@ fn main() {
                 _ => {},
             }
         }
-    
-        let view = cgmath::Matrix4::look_at(
-            &camera_pos,
-            &Point3::new(0.0f32, 0.0, 0.0),
-            &Vector3::unit_z()
-        );
 
-        let proj = cgmath::perspective(cgmath::deg(45.0f32), frame.width as f32 / frame.height as f32, 0.1f32, 100.0f32);
-
-        shader_data.transform = *proj.mul_m(&view).as_fixed();
+        camera.update();
+        shader_data.transform = *camera.get_mvp().as_fixed();
 
         renderer.clear(clear_data, gfx::COLOR | gfx::DEPTH, &frame);
         renderer.draw(&(&batch, &shader_data, &context), &frame);
