@@ -14,8 +14,6 @@ use gfx::batch;
 use glfw::Context;
 
 use cgmath::FixedArray;
-use cgmath::{Matrix, Point3, Vector3};
-use cgmath::{Transform, AffineMatrix3};
 
 mod texture;
 mod sprite;
@@ -25,7 +23,7 @@ mod camera;
 fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
-    glfw.window_hint(glfw::WindowHint::ContextVersion(3, 2));
+    glfw.window_hint(glfw::WindowHint::ContextVersion(3, 3));
     glfw.window_hint(glfw::WindowHint::OpenglForwardCompat(true));
     glfw.window_hint(glfw::WindowHint::OpenglProfile(glfw::OpenGlProfileHint::Core));
 
@@ -36,6 +34,7 @@ fn main() {
     window.make_current();
     glfw.set_error_callback(glfw::FAIL_ON_ERRORS);
     window.set_key_polling(true);
+    window.set_scroll_polling(true);
     window.set_framebuffer_size_polling(true);
     window.set_char_polling(true);
 
@@ -79,7 +78,7 @@ fn main() {
     };
 
     let mut camera = camera::Camera::new();
-    camera.eye_pos = Point3::new(0.1f32, 2.0f32, 5.0f32);
+    camera.eye_pos = cgmath::Point3::new(2.0f32, 1.0f32, 4.0f32);
 
     while !window.should_close() {
         glfw.poll_events();
@@ -89,23 +88,15 @@ fn main() {
                 glfw::WindowEvent::Key(glfw::Key::Escape, _, glfw::Action::Press, _) =>
                     window.set_should_close(true),
 
-                glfw::WindowEvent::Key(glfw::Key::W, _, _, _) =>
-                    camera.eye_pos.z -= 0.1f32,
-                
-                glfw::WindowEvent::Key(glfw::Key::S, _, _, _) =>
-                    camera.eye_pos.z += 0.1f32,
-                
-                glfw::WindowEvent::Key(glfw::Key::A, _, _, _) =>
-                    camera.eye_pos.x -= 0.1f32,
-                
-                glfw::WindowEvent::Key(glfw::Key::D, _, _, _) =>
-                    camera.eye_pos.x += 0.1f32,
-                
                 glfw::WindowEvent::FramebufferSize(w, h) => {
                     frame.width = w as u16;
                     frame.height = h as u16;
         
                     camera.aspect = frame.width as f32 / frame.height as f32;
+                    println!("aspect updated: {}", camera.aspect);
+                },
+                glfw::WindowEvent::Scroll(x, y) => {
+                    println!("scroll event: {}x{}", x, y);
                 },
                 glfw::WindowEvent::Char(c) => {
                     println!("pressed char key {}", c);
@@ -113,6 +104,23 @@ fn main() {
                 _ => {},
             }
         }
+
+        let time = glfw.get_time() as f32;
+      
+        camera.pos = {
+            let x = cgmath::sin(cgmath::rad(time));
+            let y = cgmath::cos(cgmath::rad(time));
+        
+            cgmath::Point3::new(x, y, 0.0)
+        };
+
+        //Rotate camera around origin
+        camera.eye_pos = {
+            let x = cgmath::sin(cgmath::rad(0.5*time)) * 5.0;
+            let y = cgmath::cos(cgmath::rad(0.5*time)) * 5.0;
+
+            cgmath::Point3::new(x, y, 5.0)
+        };
 
         camera.update();
         shader_data.transform = *camera.get_mvp().as_fixed();

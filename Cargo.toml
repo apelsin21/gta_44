@@ -1,11 +1,11 @@
+[dependencies.image]
+git = "https://github.com/pistondevelopers/image"
+
 [dependencies.gfx]
 git = "https://github.com/gfx-rs/gfx-rs"
 
 [dependencies.gfx_macros]
 git = "https://github.com/gfx-rs/gfx-rs"
-
-[dependencies.image]
-git = "https://github.com/pistondevelopers/image"
 
 [dependencies.glfw]
 git = "https://github.com/bjz/glfw-rs"

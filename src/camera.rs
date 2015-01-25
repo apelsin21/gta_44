@@ -13,7 +13,7 @@ pub struct Camera {
     pub look_pos: cgmath::Point3<f32>,
     pub up: cgmath::Vector3<f32>,
 
-    pub fov: f32,
+    pub fov: f32, //Defined in degrees 
     pub aspect: f32,
     pub near: f32,
     pub far: f32,
@@ -30,8 +30,8 @@ impl Camera {
             eye_pos: cgmath::Point3::new(0.0f32, 0.0, 0.0),
             look_pos: cgmath::Point3::new(0.0f32, 0.0, 0.0),
             up: cgmath::Vector3::unit_z(),
-        
-            fov: 3.1415f32,
+       
+            fov: 60.0f32,
             aspect: 1.33f32,
             near: 0.1f32,
             far: 100.0f32,
@@ -46,11 +46,11 @@ impl Camera {
             &self.look_pos,
             &self.up);
         
-        self.proj = cgmath::perspective(cgmath::rad(self.fov), self.aspect,
+        self.proj = cgmath::perspective(cgmath::deg(self.fov), self.aspect,
                                         self.near, self.far);
     }
 
     pub fn get_mvp(self: &Camera) -> cgmath::Matrix4<f32> {
-        self.proj.mul_m(&self.view)
+        self.proj.mul_m(&self.view.mul_m(&self.model))
     }
 }
